@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<style type="text/css">
+			*{margin: 0;padding: 0;}
+		</style>
+		<canvas id="tankMap" width="900px" height="600px" style="background-color:black"></canvas>
+		<script type="text/javascript">
+			
+			var canvas=document.getElementById('tankMap');
+			var cxt=canvas.getContext('2d');
+			
+			var heroX=400;
+			var heroY=400;
+			cxt.fillStyle="#0D5FAD";
+			//左边
+			cxt.fillRect(heroX,heroY,10,50);
+			//右边
+			cxt.fillRect(heroX+10+30,heroY,10,50);
+			//中间
+			cxt.fillRect(heroX+12,heroY+7,26,36);
+			
+			cxt.fillStyle="#084076";
+			//中间圆
+			cxt.arc(heroX+12+13,heroY+7+18,10,0,360,false);
+			cxt.fill();
+			//炮杆
+			cxt.strokeStyle="#084B8B";
+			cxt.lineWidth=4;
+			cxt.beginPath();
+			cxt.moveTo(heroX+12+13,heroY+7+18);
+			cxt.lineTo(heroX+12+13,heroY);
+			cxt.closePath();
+			cxt.stroke();
+			
+			
+			
+			
+		</script>
+	</body>
+</html>
