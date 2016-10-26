@@ -8,34 +8,114 @@
 		<style type="text/css">
 			*{margin: 0;padding: 0;}
 		</style>
-		<canvas id="tankMap" width="900px" height="600px" style="background-color:black"></canvas>
+		<canvas id="tankMap" width="900" height="600" style="background-color:black"></canvas>
 		<script type="text/javascript">
 			
 			var canvas=document.getElementById('tankMap');
 			var cxt=canvas.getContext('2d');
 			
-			var heroX=400;
-			var heroY=400;
-			cxt.fillStyle="#0D5FAD";
-			//左边
-			cxt.fillRect(heroX,heroY,10,50);
-			//右边
-			cxt.fillRect(heroX+10+30,heroY,10,50);
-			//中间
-			cxt.fillRect(heroX+12,heroY+7,26,36);
+			window.onload=function(){
+				var hero=new Hero(400,400,'up');
+				DrawTank(hero);
+				window.onkeydown=function(event){
+					var e=event||window.event;
+					if(e.keyCode==37){
+						hero.moveLeft();
+					}
+					if(e.keyCode==38){
+						hero.moveUp();
+					}
+					if(e.keyCode==39){
+						hero.moveRight();
+					}
+					if(e.keyCode==40){
+						hero.moveDown();
+					}
+					cxt.clearRect(0,0,900,600);
+					DrawTank(hero);
+				}
+			}
 			
-			cxt.fillStyle="#084076";
-			//中间圆
-			cxt.arc(heroX+12+13,heroY+7+18,10,0,360,false);
-			cxt.fill();
-			//炮杆
-			cxt.strokeStyle="#084B8B";
-			cxt.lineWidth=4;
-			cxt.beginPath();
-			cxt.moveTo(heroX+12+13,heroY+7+18);
-			cxt.lineTo(heroX+12+13,heroY);
-			cxt.closePath();
-			cxt.stroke();
+			
+			function Hero(x,y,direction){
+				this.x=x;
+				this.y=y;
+				this.direction=direction;
+				this.speed=2;
+				this.moveUp=function(){
+					this.y-=this.speed;
+					this.direction="up";
+					console.log('up')
+				}
+				this.moveRight=function(){
+					this.x+=this.speed;
+					this.direction="right";
+				}
+				this.moveDown=function(){
+					this.y+=this.speed;
+					this.direction="down";
+				}
+				this.moveLeft=function(){
+					this.x-=this.speed;
+					this.direction="left";
+				}
+			}
+			function DrawTank(tank){
+				if(tank.direction=='up'||tank.direction=='down'){
+					cxt.fillStyle="#0D5FAD";
+					//左边
+					cxt.fillRect(tank.x-25,tank.y-25,10,50);
+					//右边
+					cxt.fillRect(tank.x+15,tank.y-25,10,50);
+					//中间
+					cxt.fillRect(tank.x-13,tank.y-18,26,36);
+					
+					cxt.fillStyle="#084076";
+					//中间圆
+					cxt.arc(tank.x,tank.y,10,0,360,false);
+					cxt.fill();
+					//炮杆
+					cxt.strokeStyle="#084B8B";
+					cxt.lineWidth=4;
+					cxt.beginPath();
+					cxt.moveTo(tank.x,tank.y);
+					if(tank.direction=="up"){
+						cxt.lineTo(tank.x,tank.y-25);
+					}else if(tank.direction=="down"){
+						cxt.lineTo(tank.x,tank.y+25);
+					}
+					cxt.closePath();
+					cxt.stroke();
+				}else if(tank.direction=='left'||tank.direction=='right'){
+					cxt.fillStyle="#0D5FAD";
+					//上边
+					cxt.fillRect(tank.x-25,tank.y-25,50,10);
+					//下边
+					cxt.fillRect(tank.x-25,tank.y+15,50,10);
+					//中间
+					cxt.fillRect(tank.x-18,tank.y-13,36,26);
+					
+					cxt.fillStyle="#084076";
+					//中间圆
+					cxt.arc(tank.x,tank.y,10,0,360,false);
+					cxt.fill();
+					//炮杆
+					cxt.strokeStyle="#084B8B";
+					cxt.lineWidth=4;
+					cxt.beginPath();
+					cxt.moveTo(tank.x,tank.y);
+					if(tank.direction=="left"){
+						cxt.lineTo(tank.x-25,tank.y);
+					}else if(tank.direction=="right"){
+						cxt.lineTo(tank.x+25,tank.y);
+					}
+					cxt.closePath();
+					cxt.stroke();
+				}
+				
+				
+			}
+			
 			
 			
 			
