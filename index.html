@@ -19,6 +19,7 @@
 			var hero=new Hero(400,400,'up',heroColor);
 			var heroBullet=null;
 			var enemyTanks=[];
+			var heroBullets=[];
 			for(var i=0;i<enmeyNum;i++){
 				var enemyTank=new Enemy((i+1)*150,40,'down',enmeyColor);
 				enemyTanks[i]=enemyTank;
@@ -79,12 +80,15 @@
 				}
 			}
 			function drawHeroBullet(){
-				if(heroBullet!=null&&heroBullet.isLive){
-					cxt.beginPath();
-					cxt.fillStyle="#084B8B";
-					cxt.arc(heroBullet.x,heroBullet.y,2,0,2*Math.PI,false);
-					cxt.closePath();
-					cxt.fill();
+				for(var i=0;i<heroBullets.length;i++){
+					var heroBullet=heroBullets[i];
+					if(heroBullet!=null&&heroBullet.isLive){
+						cxt.beginPath();
+						cxt.fillStyle="#084B8B";
+						cxt.arc(heroBullet.x,heroBullet.y,2,0,2*Math.PI,false);
+						cxt.closePath();
+						cxt.fill();
+					}
 				}
 			}
 			function Tank(x,y,direction,color){
@@ -115,7 +119,8 @@
 				this.tank(x,y,direction,color);
 				this.shoot=function(){
 					heroBullet=new Bullet(this.x,this.y,this.direction,4);
-					heroBullet.timer=setInterval("heroBullet.run()",50);
+					heroBullets.push(heroBullet);
+					heroBullets[heroBullets.length-1].timer=setInterval("heroBullets["+(heroBullets.length-1)+"].run()",50);
 				}
 			}
 			function Enemy(x,y,direction,color){
