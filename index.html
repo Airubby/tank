@@ -16,10 +16,11 @@
 			var heroColor=['#0D5FAD','#084076','#084B8B'];
 			var enmeyColor=['#C61FC9','#7E0A7E','#AA0FAD'];
 			var enmeyNum=3;
-			var hero=new Tank(400,400,'up',heroColor);
+			var hero=new Hero(400,400,'up',heroColor);
+			var heroBullet=null;
 			var enemyTanks=[];
 			for(var i=0;i<enmeyNum;i++){
-				var enemyTank=new Tank((i+1)*150,40,'down',enmeyColor);
+				var enemyTank=new Enemy((i+1)*150,40,'down',enmeyColor);
 				enemyTanks[i]=enemyTank;
 			}
 			refresh();
@@ -37,17 +38,55 @@
 				if(e.keyCode==40){
 					hero.moveDown();
 				}
+				if(e.keyCode==32){
+					hero.shoot();
+				}
 				refresh();
 			}
-			
+			setInterval("refresh()",100);
 			function refresh(){
 				cxt.clearRect(0,0,900,600);
 				DrawTank(hero);
+				drawHeroBullet();
 				for(var i=0;i<enmeyNum;i++){
 					DrawTank(enemyTanks[i])
 				}
+				
 			}
-			
+			setInterval("refresh()",100);
+			function Bullet(x,y,direction,speed){
+				this.x=x;
+				this.y=y;
+				this.direction=direction;
+				this.speed=speed;
+				this.timer=null;
+				this.isLive=true;
+				this.run=function(){
+					if(this.x<=0||this.x>=900||this.y<=0||this.y>=600){
+						clearInterval(this.timer);
+						this.isLive=false;
+					}else{
+						if(this.direction=="up"){
+							this.y-=this.speed;
+						}else if(this.direction=="right"){
+							this.x+=this.speed;
+						}else if(this.direction=="down"){
+							this.y+=this.speed;
+						}else if(this.direction=="left"){
+							this.x-=this.speed;
+						}
+					}
+				}
+			}
+			function drawHeroBullet(){
+				if(heroBullet!=null&&heroBullet.isLive){
+					cxt.beginPath();
+					cxt.fillStyle="#084B8B";
+					cxt.arc(heroBullet.x,heroBullet.y,2,0,2*Math.PI,false);
+					cxt.closePath();
+					cxt.fill();
+				}
+			}
 			function Tank(x,y,direction,color){
 				this.x=x;
 				this.y=y;
@@ -71,6 +110,18 @@
 					this.direction="left";
 				}
 			}
+			function Hero(x,y,direction,color){
+				this.tank=Tank;
+				this.tank(x,y,direction,color);
+				this.shoot=function(){
+					heroBullet=new Bullet(this.x,this.y,this.direction,4);
+					heroBullet.timer=setInterval("heroBullet.run()",50);
+				}
+			}
+			function Enemy(x,y,direction,color){
+				this.tank=Tank;
+				this.tank(x,y,direction,color);
+			}
 			function DrawTank(tank){
 				if(tank.direction=='up'||tank.direction=='down'){
 					cxt.fillStyle=tank.color[0];
@@ -81,9 +132,11 @@
 					//中间
 					cxt.fillRect(tank.x-13,tank.y-18,26,36);
 					
-					cxt.fillStyle=tank.color[1];
 					//中间圆
-					cxt.arc(tank.x,tank.y,10,0,360,false);
+					cxt.beginPath();
+					cxt.fillStyle=tank.color[1];
+					cxt.arc(tank.x,tank.y,10,0,2*Math.PI,true);
+					cxt.closePath();
 					cxt.fill();
 					//炮杆
 					cxt.strokeStyle=tank.color[2];
@@ -106,9 +159,11 @@
 					//中间
 					cxt.fillRect(tank.x-18,tank.y-13,36,26);
 					
-					cxt.fillStyle=tank.color[1];
 					//中间圆
-					cxt.arc(tank.x,tank.y,10,0,360,false);
+					cxt.beginPath();
+					cxt.fillStyle=tank.color[1];
+					cxt.arc(tank.x,tank.y,10,0,2*Math.PI,true);
+					cxt.closePath();
 					cxt.fill();
 					//炮杆
 					cxt.strokeStyle=tank.color[2];
