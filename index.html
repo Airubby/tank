@@ -8,15 +8,15 @@
 		<style type="text/css">
 			*{margin: 0;padding: 0;}
 		</style>
-		<canvas id="tankMap" width="900" height="600" style="background-color:black"></canvas>
+		<canvas id="tankMap" width="900" height="600" style="background-color:black;margin: 0 auto;display: block;"></canvas>
 		<script type="text/javascript">
 			
 			var canvas=document.getElementById('tankMap');
 			var cxt=canvas.getContext('2d');
 			var heroColor=['#0D5FAD','#084076','#084B8B'];
 			var enmeyColor=['#C61FC9','#7E0A7E','#AA0FAD'];
-			var enmeyNum=3;
-			var hero=new Hero(400,400,'up',heroColor);
+			var enmeyNum=5;
+			var hero=new Hero(400,550,'up',heroColor);
 			var heroBullet=null;
 			var enemyTanks=[];
 			var heroBullets=[];
@@ -49,6 +49,7 @@
 				cxt.clearRect(0,0,900,600);
 				DrawTank(hero);
 				drawHeroBullet();
+				isHitEnemyTank();
 				for(var i=0;i<enmeyNum;i++){
 					DrawTank(enemyTanks[i])
 				}
@@ -97,6 +98,7 @@
 				this.direction=direction;
 				this.color=color
 				this.speed=2;
+				this.isLive=true;
 				this.moveUp=function(){
 					this.y-=this.speed;
 					this.direction="up";
@@ -128,66 +130,84 @@
 				this.tank(x,y,direction,color);
 			}
 			function DrawTank(tank){
-				if(tank.direction=='up'||tank.direction=='down'){
-					cxt.fillStyle=tank.color[0];
-					//左边
-					cxt.fillRect(tank.x-25,tank.y-25,10,50);
-					//右边
-					cxt.fillRect(tank.x+15,tank.y-25,10,50);
-					//中间
-					cxt.fillRect(tank.x-13,tank.y-18,26,36);
-					
-					//中间圆
-					cxt.beginPath();
-					cxt.fillStyle=tank.color[1];
-					cxt.arc(tank.x,tank.y,10,0,2*Math.PI,true);
-					cxt.closePath();
-					cxt.fill();
-					//炮杆
-					cxt.strokeStyle=tank.color[2];
-					cxt.lineWidth=4;
-					cxt.beginPath();
-					cxt.moveTo(tank.x,tank.y);
-					if(tank.direction=="up"){
-						cxt.lineTo(tank.x,tank.y-25);
-					}else if(tank.direction=="down"){
-						cxt.lineTo(tank.x,tank.y+25);
+				
+				if(tank.isLive){
+					if(tank.direction=='up'||tank.direction=='down'){
+						cxt.fillStyle=tank.color[0];
+						//左边
+						cxt.fillRect(tank.x-25,tank.y-25,10,50);
+						//右边
+						cxt.fillRect(tank.x+15,tank.y-25,10,50);
+						//中间
+						cxt.fillRect(tank.x-13,tank.y-18,26,36);
+						
+						//中间圆
+						cxt.beginPath();
+						cxt.fillStyle=tank.color[1];
+						cxt.arc(tank.x,tank.y,10,0,2*Math.PI,true);
+						cxt.closePath();
+						cxt.fill();
+						//炮杆
+						cxt.strokeStyle=tank.color[2];
+						cxt.lineWidth=4;
+						cxt.beginPath();
+						cxt.moveTo(tank.x,tank.y);
+						if(tank.direction=="up"){
+							cxt.lineTo(tank.x,tank.y-25);
+						}else if(tank.direction=="down"){
+							cxt.lineTo(tank.x,tank.y+25);
+						}
+						cxt.closePath();
+						cxt.stroke();
+					}else if(tank.direction=='left'||tank.direction=='right'){
+						cxt.fillStyle=tank.color[0];
+						//上边
+						cxt.fillRect(tank.x-25,tank.y-25,50,10);
+						//下边
+						cxt.fillRect(tank.x-25,tank.y+15,50,10);
+						//中间
+						cxt.fillRect(tank.x-18,tank.y-13,36,26);
+						
+						//中间圆
+						cxt.beginPath();
+						cxt.fillStyle=tank.color[1];
+						cxt.arc(tank.x,tank.y,10,0,2*Math.PI,true);
+						cxt.closePath();
+						cxt.fill();
+						//炮杆
+						cxt.strokeStyle=tank.color[2];
+						cxt.lineWidth=4;
+						cxt.beginPath();
+						cxt.moveTo(tank.x,tank.y);
+						if(tank.direction=="left"){
+							cxt.lineTo(tank.x-25,tank.y);
+						}else if(tank.direction=="right"){
+							cxt.lineTo(tank.x+25,tank.y);
+						}
+						cxt.closePath();
+						cxt.stroke();
 					}
-					cxt.closePath();
-					cxt.stroke();
-				}else if(tank.direction=='left'||tank.direction=='right'){
-					cxt.fillStyle=tank.color[0];
-					//上边
-					cxt.fillRect(tank.x-25,tank.y-25,50,10);
-					//下边
-					cxt.fillRect(tank.x-25,tank.y+15,50,10);
-					//中间
-					cxt.fillRect(tank.x-18,tank.y-13,36,26);
-					
-					//中间圆
-					cxt.beginPath();
-					cxt.fillStyle=tank.color[1];
-					cxt.arc(tank.x,tank.y,10,0,2*Math.PI,true);
-					cxt.closePath();
-					cxt.fill();
-					//炮杆
-					cxt.strokeStyle=tank.color[2];
-					cxt.lineWidth=4;
-					cxt.beginPath();
-					cxt.moveTo(tank.x,tank.y);
-					if(tank.direction=="left"){
-						cxt.lineTo(tank.x-25,tank.y);
-					}else if(tank.direction=="right"){
-						cxt.lineTo(tank.x+25,tank.y);
-					}
-					cxt.closePath();
-					cxt.stroke();
 				}
 				
 				
 			}
 			
-			
+			function isHitEnemyTank(){
+				for(var i=0;i<heroBullets.length;i++){
+					var heroBullet=heroBullets[i];
+					if(heroBullet.isLive){
+						for(var j=0;j<enemyTanks.length;j++){
+							var enemyTank=enemyTanks[j];
+							if(enemyTank.isLive){
+								if(enemyTank.x-25<=heroBullet.x&&enemyTank.x+25>=heroBullet.x&&enemyTank.y-25<=heroBullet.y&&enemyTank.y+25>=heroBullet.y){
+									enemyTank.isLive=false;
+									heroBullet.isLive=false;
+								}
+							}
+						}
+					}
+				}
+			}
 			
 			
 			
