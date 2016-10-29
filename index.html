@@ -8,6 +8,7 @@
 		<style type="text/css">
 			*{margin: 0;padding: 0;}
 		</style>
+		<div>键盘箭头控制方向，空格发子弹</div>
 		<canvas id="tankMap" width="900" height="600" style="background-color:black;margin: 0 auto;display: block;"></canvas>
 		<script type="text/javascript">
 			
@@ -21,10 +22,14 @@
 			var enemyTanks=[];
 			var heroBullets=[];
 			var bombs=[];
+			var enemyBullets=[];
 			for(var i=0;i<enmeyNum;i++){
 				var enemyTank=new Enemy((i+1)*150,40,'down',enmeyColor);
 				enemyTanks[i]=enemyTank;
 				window.setInterval("enemyTanks["+i+"].run()",50);
+				enemyBullets[i]=new Bullet(enemyTanks[i].x,enemyTanks[i].y,'down',6,"enemy",enemyTanks[i]);
+				//启动该子弹
+				enemyBullets[i].timer=window.setInterval("enemyBullets["+i+"].run()",50);
 			}
 			refresh();
 			window.onkeydown=function(event){
@@ -58,20 +63,26 @@
 					DrawTank(enemyTanks[i])
 				}
 				drawEnemyBomb();
+				drawEnemyBullet();
 				
 			}
 			setInterval("refresh()",100);
-			function Bullet(x,y,direction,speed){
+			function Bullet(x,y,direction,speed,type,tank){
 				this.x=x;
 				this.y=y;
 				this.direction=direction;
 				this.speed=speed;
+				this.type=type;
+				this.tank=tank;
 				this.timer=null;
 				this.isLive=true;
 				this.run=function(){
 					if(this.x<=0||this.x>=900||this.y<=0||this.y>=600){
 						clearInterval(this.timer);
 						this.isLive=false;
+						if(this.type=="enemy"){
+							this.tank.bulletIsLive=false;
+						}
 					}else{
 						if(this.direction=="up"){
 							this.y-=this.speed;
@@ -98,7 +109,16 @@
 				}
 			}
 			function drawEnemyBullet(){
-				
+				for(var i=0;i<enemyBullets.length;i++){
+					var enemyBullet=enemyBullets[i];
+					if(enemyBullet.isLive){
+						cxt.beginPath();
+						cxt.fillStyle="#AA0FAD";
+						cxt.arc(enemyBullet.x,enemyBullet.y,2,0,2*Math.PI,false);
+						cxt.closePath();
+						cxt.fill();
+					}
+				}
 			}
 			function Bomb(x,y){
 				this.x=x;
@@ -182,6 +202,7 @@
 				this.tank=Tank;
 				this.tank(x,y,direction,color);
 				this.count=0;
+				this.bulletIsLive=true;
 				this.run=function(){
 					if(this.direction=="up"&&this.y>25){
 						this.y-=this.speed;
@@ -206,6 +227,12 @@
 						this.count=0;
 					}
 					this.count++;
+					if(this.bulletIsLive==false){
+						enemyBullet=new Bullet(this.x,this.y,this.direction,8,"enemy",this);
+						enemyBullets.push(enemyBullet);
+						enemyBullets[enemyBullets.length-1].timer=window.setInterval("enemyBullets["+(enemyBullets.length-1)+"].run()",50);
+						this.bulletIsLive=true;
+					}
 				}
 			}
 			function DrawTank(tank){
