@@ -20,6 +20,7 @@
 			var heroBullet=null;
 			var enemyTanks=[];
 			var heroBullets=[];
+			var bombs=[];
 			for(var i=0;i<enmeyNum;i++){
 				var enemyTank=new Enemy((i+1)*150,40,'down',enmeyColor);
 				enemyTanks[i]=enemyTank;
@@ -48,11 +49,14 @@
 			function refresh(){
 				cxt.clearRect(0,0,900,600);
 				DrawTank(hero);
-				drawHeroBullet();
+				if(heroBullets.length>0){
+					drawHeroBullet();
+				}
 				isHitEnemyTank();
 				for(var i=0;i<enmeyNum;i++){
 					DrawTank(enemyTanks[i])
 				}
+				drawEnemyBomb();
 				
 			}
 			setInterval("refresh()",100);
@@ -89,6 +93,54 @@
 						cxt.arc(heroBullet.x,heroBullet.y,2,0,2*Math.PI,false);
 						cxt.closePath();
 						cxt.fill();
+					}
+				}
+			}
+			function drawEnemyBullet(){
+				
+			}
+			function Bomb(x,y){
+				this.x=x;
+				this.y=y;
+				this.isLive=true; //炸弹可以用
+				this.blood=9;  //炸弹的生命值
+				this.bloodDown=function(){
+					if(this.blood>0){
+						this.blood--;
+					}else{
+						this.isLive=false;
+					}
+				}
+			}
+			function drawEnemyBomb(){
+				for(var i=0;i<bombs.length;i++){
+					var bomb=bombs[i];
+					if(bomb.isLive){
+						var x=bomb.x;
+						var y=bomb.y;
+						if(bomb.blood>6){
+							var img1=new Image();
+							img1.src="images/bomb_1.gif";
+							img1.onload=function(){
+								cxt.drawImage(img1,x-15,y-15,30,30);
+							}
+						}else if(bomb.blood>3){
+							var img2=new Image();
+							img2.src="images/bomb_2.gif";
+							img2.onload=function(){
+								cxt.drawImage(img2,x-15,y-15,30,30);
+							}
+						}else{
+							var img3=new Image();
+							img3.src="images/bomb_3.gif";
+							img3.onload=function(){
+								cxt.drawImage(img3,x-15,y-15,30,30);
+							}
+						}
+						bomb.bloodDown();
+						if(bomb.blood<=0){
+							bombs.splice(i,1);
+						}
 					}
 				}
 			}
@@ -202,6 +254,8 @@
 								if(enemyTank.x-25<=heroBullet.x&&enemyTank.x+25>=heroBullet.x&&enemyTank.y-25<=heroBullet.y&&enemyTank.y+25>=heroBullet.y){
 									enemyTank.isLive=false;
 									heroBullet.isLive=false;
+									var bomb=new Bomb(enemyTank.x,enemyTank.y);
+									bombs.push(bomb);
 								}
 							}
 						}
