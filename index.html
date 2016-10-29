@@ -24,6 +24,7 @@
 			for(var i=0;i<enmeyNum;i++){
 				var enemyTank=new Enemy((i+1)*150,40,'down',enmeyColor);
 				enemyTanks[i]=enemyTank;
+				window.setInterval("enemyTanks["+i+"].run()",50);
 			}
 			refresh();
 			window.onkeydown=function(event){
@@ -149,7 +150,7 @@
 				this.y=y;
 				this.direction=direction;
 				this.color=color
-				this.speed=2;
+				this.speed=4;
 				this.isLive=true;
 				this.moveUp=function(){
 					this.y-=this.speed;
@@ -172,7 +173,7 @@
 				this.tank=Tank;
 				this.tank(x,y,direction,color);
 				this.shoot=function(){
-					heroBullet=new Bullet(this.x,this.y,this.direction,4);
+					heroBullet=new Bullet(this.x,this.y,this.direction,8);
 					heroBullets.push(heroBullet);
 					heroBullets[heroBullets.length-1].timer=setInterval("heroBullets["+(heroBullets.length-1)+"].run()",50);
 				}
@@ -180,6 +181,32 @@
 			function Enemy(x,y,direction,color){
 				this.tank=Tank;
 				this.tank(x,y,direction,color);
+				this.count=0;
+				this.run=function(){
+					if(this.direction=="up"&&this.y>25){
+						this.y-=this.speed;
+					}else if(this.direction=="right"&&this.x<900-25){
+						this.x+=this.speed;
+					}else if(this.direction=="down"&&this.y<600-25){
+						this.y+=this.speed;
+					}else if(this.direction=="left"&&this.x>25){
+						this.x-=this.speed;
+					}
+					if(this.count>30){
+						var direct=Math.round(Math.random()*3);
+						if(direct==0){
+							this.direction="up";
+						}else if(direct==1){
+							this.direction="right";
+						}else if(direct==2){
+							this.direction="down";
+						}else if(direct==3){
+							this.direction="left";
+						}
+						this.count=0;
+					}
+					this.count++;
+				}
 			}
 			function DrawTank(tank){
 				
